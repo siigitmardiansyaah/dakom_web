@@ -44,12 +44,12 @@ class Absen_m extends CI_Model{
     }else{
         $hari_ini = date('Y-m-d');
         $jam_sekarang = date('H:i');
-        $cekQR = $this->db->query("SELECT * FROM tbqr where id_qr = '$id_qr'")->row();
+        $cekQR = $this->db->query("SELECT * FROM tbabsen where id_karyawan = '$id_pegawai' AND DATE_FORMAT(waktu_absen, '%Y-%m-%d') = '$hari_ini' ")->num_rows();
         $cekJamDatang = $this->db->query("SELECT * from tbabsen where id_karyawan = '$id_pegawai' AND id_jam = 1 AND DATE_FORMAT(waktu_absen, '%Y-%m-%d') = '$hari_ini'")->num_rows();
         $cekJamPulang = $this->db->query("SELECT * from tbabsen where id_karyawan = '$id_pegawai' AND id_jam = 2 AND DATE_FORMAT(waktu_absen, '%Y-%m-%d') = '$hari_ini'")->num_rows();
         $queryJamDatang = $this->db->query("SELECT * FROM tbjam where id_jam = 1")->row();
         $queryJamPulang = $this->db->query("SELECT * FROM tbjam where id_jam = 2")->row();
-        if(date('Y-m-d',strtotime($cekQR->waktu_buat)) == $hari_ini) {
+        if($cekQR <= 2) {
           if($cekJamDatang < 1 && $cekJamPulang < 1) {
             if($jam_sekarang >= date('H:i',strtotime($queryJamDatang->batas_awal)) && $jam_sekarang <= date('H:i',strtotime($queryJamDatang->batas_akhir))) {
                 $data = array(
@@ -112,7 +112,7 @@ class Absen_m extends CI_Model{
         } else {
           $response['status']=502;
           $response['error']=true;
-          $response['message']='Anda Absen Dengan QR yang lama';
+          $response['message']='Anda Sudah Absen untuk Hari ini';
           return $response;
         }
 
